@@ -107,73 +107,73 @@ char	*get_next_line(int fd)
 	return (get_next_line(fd));
 }
 
-#include <stdio.h>
+// #include <stdio.h>
 
-int main(int argc, char **argv)
-{
-    if (argc < 2)
-    {
-        printf("Usage: %s <file1> <file2> ...\n", argv[0]);
-        printf("Or run with no arguments to read from stdin.\n\n");
-        printf("⌨️ Reading from standard input (CTRL+D to stop):\n\n");
+// int main(int argc, char **argv)
+// {
+//     if (argc < 2)
+//     {
+//         printf("Usage: %s <file1> <file2> ...\n", argv[0]);
+//         printf("Or run with no arguments to read from stdin.\n\n");
+//         printf("⌨️ Reading from standard input (CTRL+D to stop):\n\n");
 
-        char *line;
-        int i = 1;
+//         char *line;
+//         int i = 1;
 
-        while ((line = get_next_line(0)) != NULL)
-        {
-            printf("STDIN Line %d: %s", i++, line);
-            free(line);
-        }
-        return 0;
-    }
+//         while ((line = get_next_line(0)) != NULL)
+//         {
+//             printf("STDIN Line %d: %s", i++, line);
+//             free(line);
+//         }
+//         return 0;
+//     }
 
-    int count = argc - 1;
-    int fds[count];
-    char *line;
-    int done = 0;
+//     int count = argc - 1;
+//     int fds[count];
+//     char *line;
+//     int done = 0;
 
-    /* Open all files */
-    for (int i = 0; i < count; i++)
-    {
-        fds[i] = open(argv[i + 1], O_RDONLY);
-        if (fds[i] < 0)
-        {
-            perror(argv[i + 1]);
-            fds[i] = -1;
-        }
-        else
-        {
-            printf("📄 Opened: %s (fd %d)\n", argv[i + 1], fds[i]);
-        }
-    }
-    printf("\n--- READING INTERLEAVED LINES ---\n\n");
+//     /* Open all files */
+//     for (int i = 0; i < count; i++)
+//     {
+//         fds[i] = open(argv[i + 1], O_RDONLY);
+//         if (fds[i] < 0)
+//         {
+//             perror(argv[i + 1]);
+//             fds[i] = -1;
+//         }
+//         else
+//         {
+//             printf("📄 Opened: %s (fd %d)\n", argv[i + 1], fds[i]);
+//         }
+//     }
+//     printf("\n--- READING INTERLEAVED LINES ---\n\n");
 
-    int line_num = 1;
+//     int line_num = 1;
 
-    while (!done)
-    {
-        done = 1;
-        for (int i = 0; i < count; i++)
-        {
-            if (fds[i] < 0)
-                continue;
+//     while (!done)
+//     {
+//         done = 1;
+//         for (int i = 0; i < count; i++)
+//         {
+//             if (fds[i] < 0)
+//                 continue;
 
-            line = get_next_line(fds[i]);
+//             line = get_next_line(fds[i]);
 
-            if (line)
-            {
-                printf("[%s] Line %d: %s", argv[i + 1], line_num, line);
-                free(line);
-                done = 0;
-            }
-        }
-        line_num++;
-    }
+//             if (line)
+//             {
+//                 printf("[%s] Line %d: %s", argv[i + 1], line_num, line);
+//                 free(line);
+//                 done = 0;
+//             }
+//         }
+//         line_num++;
+//     }
 
-    for (int i = 0; i < count; i++)
-        if (fds[i] > 2)
-            close(fds[i]);
+//     for (int i = 0; i < count; i++)
+//         if (fds[i] > 2)
+//             close(fds[i]);
 
-    return 0;
-}
+//     return 0;
+// }

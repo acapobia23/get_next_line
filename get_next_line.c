@@ -107,38 +107,38 @@ char	*get_next_line(int fd)
 	return (get_next_line(fd));
 }
 
-#include <stdio.h>
-int main(int argc, char **argv)
-{
-    int fd;
-    char *line;
-    int i = 1;
+// #include <stdio.h>
+// int main(int argc, char **argv)
+// {
+//     int fd;
+//     char *line;
+//     int i = 1;
 
-    if (argc == 2)
-    {
-        fd = open(argv[1], O_RDONLY);
-        if (fd < 0)
-        {
-            perror("Error opening file");
-            return 1;
-        }
-        printf("📄 Reading from file: %s\n\n", argv[1]);
-    }
-    else
-    {
-        fd = 0; // STDIN
-        printf("⌨️ Reading from standard input (CTRL+D to stop):\n\n");
-    }
+//     if (argc == 2)
+//     {
+//         fd = open(argv[1], O_RDONLY);
+//         if (fd < 0)
+//         {
+//             perror("Error opening file");
+//             return 1;
+//         }
+//         printf("📄 Reading from file: %s\n\n", argv[1]);
+//     }
+//     else
+//     {
+//         fd = 0; // STDIN
+//         printf("⌨️ Reading from standard input (CTRL+D to stop):\n\n");
+//     }
 
-    while ((line = get_next_line(fd)) != NULL)
-    {
-        printf("Line %d: %s", i, line);
-        free(line);
-        i++;
-    }
+//     while ((line = get_next_line(fd)) != NULL)
+//     {
+//         printf("Line %d: %s", i, line);
+//         free(line);
+//         i++;
+//     }
 
-    if (fd > 2) // evita di chiudere stdin, stdout o stderr accidentalmente
-        close(fd);
+//     if (fd > 2) // evita di chiudere stdin, stdout o stderr accidentalmente
+//         close(fd);
 
-    return 0;
-}
+//     return 0;
+// }
