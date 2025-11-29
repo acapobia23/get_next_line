@@ -88,57 +88,92 @@ int	check_str(char *str)
 
 char	*get_next_line(int fd)
 {
-	static char	*str = NULL;
+	static char	*str[1024];
 	int			end_file;
 
 	if (fd < 0 || BUFFER_SIZE < 1)
 		return (NULL);
-	if (check_str(str) == 0)
-		return (extract_line(&str));
-	end_file = new_call(&str, fd);
+	if (check_str(str[fd]) == 0)
+		return (extract_line(&str[fd]));
+	end_file = new_call(&str[fd], fd);
 	if (end_file == 0)
-		return (extract_line_eof(&str));
+		return (extract_line_eof(&str[fd]));
 	else if (end_file == -1)
 	{
-		if (str)
-			free(str);
+		if (str[fd])
+			free(str[fd]);
 		return (NULL);
 	}
 	return (get_next_line(fd));
 }
 
 #include <stdio.h>
+
 int main(int argc, char **argv)
 {
-    int fd;
-    char *line;
-    int i = 1;
-
-    if (argc == 2)
+    if (argc < 2)
     {
-        fd = open(argv[1], O_RDONLY);
-        if (fd < 0)
-        {
-            perror("Error opening file");
-            return 1;
-        }
-        printf("📄 Reading from file: %s\n\n", argv[1]);
-    }
-    else
-    {
-        fd = 0; // STDIN
+        printf("Usage: %s <file1> <file2> ...\n", argv[0]);
+        printf("Or run with no arguments to read from stdin.\n\n");
         printf("⌨️ Reading from standard input (CTRL+D to stop):\n\n");
+
+        char *line;
+        int i = 1;
+
+        while ((line = get_next_line(0)) != NULL)
+        {
+            printf("STDIN Line %d: %s", i++, line);
+            free(line);
+        }
+        return 0;
     }
 
-    while ((line = get_next_line(fd)) != NULL)
+    int count = argc - 1;
+    int fds[count];
+    char *line;
+    int done = 0;
+
+    /* Open all files */
+    for (int i = 0; i < count; i++)
     {
-        printf("Line %d: %s", i, line);
-        free(line);
-        i++;
+        fds[i] = open(argv[i + 1], O_RDONLY);
+        if (fds[i] < 0)
+        {
+            perror(argv[i + 1]);
+            fds[i] = -1;
+        }
+        else
+        {
+            printf("📄 Opened: %s (fd %d)\n", argv[i + 1], fds[i]);
+        }
+    }
+    printf("\n--- READING INTERLEAVED LINES ---\n\n");
+
+    int line_num = 1;
+
+    while (!done)
+    {
+        done = 1;
+        for (int i = 0; i < count; i++)
+        {
+            if (fds[i] < 0)
+                continue;
+
+            line = get_next_line(fds[i]);
+
+            if (line)
+            {
+                printf("[%s] Line %d: %s", argv[i + 1], line_num, line);
+                free(line);
+                done = 0;
+            }
+        }
+        line_num++;
     }
 
-    if (fd > 2) // evita di chiudere stdin, stdout o stderr accidentalmente
-        close(fd);
+    for (int i = 0; i < count; i++)
+        if (fds[i] > 2)
+            close(fds[i]);
 
     return 0;
 }
